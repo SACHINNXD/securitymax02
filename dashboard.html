@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<nav class="navbar">
+    <a href="/" class="nav-logo">Security Max</a>
+
+    <ul class="nav-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/setup.html">Setup</a></li>
+        <li><a href="/support.html">Support</a></li>
+        <li><a href="/dashboard.html" class="active">Dashboard</a></li>
+    </ul>
+
+    <div class="auth-area">
+        <a href="/.netlify/functions/login" class="login-btn" id="loginBtn">
+            Login with Discord
+        </a>
+
+        <div class="user-info" id="userInfo" style="display:none;">
+            <span id="username"></span>
+            |
+            <a href="/.netlify/functions/logout">Logout</a>
+        </div>
+    </div>
+</nav>
+
+<main class="dashboard">
+
+    <!-- WELCOME -->
+    <section class="welcome">
+        <p class="welcome-small">WELCOME BACK,</p>
+        <h1 id="welcomeName">User</h1>
+        <p class="welcome-sub">Where would you like to start?</p>
+
+        <div class="dashboard-tabs">
+            <button class="tab active">SERVERS</button>
+        </div>
+    </section>
+
+    <!-- SERVERS -->
+    <section class="servers-section">
+        <h2 class="servers-title">
+            <span>YOUR</span> SERVERS
+        </h2>
+
+        <div id="servers" class="servers-grid">
+            <!-- Filled by JS -->
+        </div>
+    </section>
+
+</main>
+
+<script src="/js/script.js"></script>
+</body>
+</html>
