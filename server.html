@@ -150,8 +150,119 @@
       display: block;
     }
 
-    .section h2 {
-      margin-top: 0;
+    /* ================= ANTINUKE TOGGLE ================= */
+
+    .setting-row {
+      margin-top: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 420px;
+    }
+
+    .toggle {
+      position: relative;
+      width: 46px;
+      height: 24px;
+    }
+
+    .toggle input {
+      display: none;
+    }
+
+    .slider {
+      position: absolute;
+      inset: 0;
+      background: #334155;
+      border-radius: 24px;
+      transition: 0.25s;
+      cursor: pointer;
+    }
+
+    .slider::before {
+      content: "";
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      background: #fff;
+      border-radius: 50%;
+      left: 3px;
+      bottom: 3px;
+      transition: 0.25s;
+    }
+
+    .toggle input:checked + .slider {
+      background: #22c55e;
+    }
+
+    .toggle input:checked + .slider::before {
+      transform: translateX(22px);
+    }
+
+    /* ================= SAVE BAR ================= */
+
+    .save-bar {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #020617;
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 14px 20px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      z-index: 200;
+    }
+
+    .save-bar button {
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .save-bar .save {
+      background: #5865F2;
+      color: #fff;
+    }
+
+    .save-bar .discard {
+      background: transparent;
+      color: #cbd5f5;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    /* ================= UNSAVED MODAL ================= */
+
+    .unsaved-modal {
+      position: fixed;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #020617;
+      padding: 18px 26px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.12);
+      font-weight: 600;
+      z-index: 300;
+    }
+
+    @keyframes shake {
+      0% { transform: translate(-50%, -50%) translateX(0); }
+      25% { transform: translate(-50%, -50%) translateX(-6px); }
+      50% { transform: translate(-50%, -50%) translateX(6px); }
+      75% { transform: translate(-50%, -50%) translateX(-6px); }
+      100% { transform: translate(-50%, -50%) translateX(0); }
+    }
+
+    .shake {
+      animation: shake 0.4s;
     }
   </style>
 </head>
@@ -204,7 +315,14 @@
 
         <section id="antinuke" class="section">
           <h2>AntiNuke</h2>
-          <p>Anti-nuke protection settings.</p>
+
+          <div class="setting-row">
+            <span>Enable Anti-Nuke</span>
+            <label class="toggle">
+              <input type="checkbox" id="antinukeToggle">
+              <span class="slider"></span>
+            </label>
+          </div>
         </section>
 
         <section id="antiraid" class="section">
@@ -242,20 +360,51 @@
           <p>Whitelisted users and roles.</p>
         </section>
       </main>
-
     </div>
   </div>
 
-  <!-- EXISTING JS (DO NOT CHANGE) -->
+  <!-- SAVE BAR -->
+  <div id="saveBar" class="save-bar hidden">
+    <span>You have unsaved changes</span>
+    <button class="save" onclick="saveChanges()">Save</button>
+    <button class="discard" onclick="discardChanges()">Discard</button>
+  </div>
+
+  <div id="unsavedModal" class="unsaved-modal hidden">
+    Please save or discard your changes
+  </div>
+
+  <!-- EXISTING JS -->
   <script src="/js/server.js"></script>
 
-  <!-- SIDEBAR NAV LOGIC -->
+  <!-- UPDATED NAV + ANTINUKE LOGIC -->
   <script>
     const navItems = document.querySelectorAll(".nav-item");
     const sections = document.querySelectorAll(".section");
 
+    let isDirty = false;
+    let lastSaved = false;
+
+    const toggle = document.getElementById("antinukeToggle");
+    const saveBar = document.getElementById("saveBar");
+    const modal = document.getElementById("unsavedModal");
+
+    if (toggle) {
+      toggle.addEventListener("change", () => {
+        isDirty = true;
+        saveBar.classList.remove("hidden");
+      });
+    }
+
     navItems.forEach(btn => {
       btn.addEventListener("click", () => {
+        if (isDirty) {
+          modal.classList.remove("hidden");
+          modal.classList.add("shake");
+          setTimeout(() => modal.classList.remove("shake"), 400);
+          return;
+        }
+
         navItems.forEach(b => b.classList.remove("active"));
         sections.forEach(s => s.classList.remove("active"));
 
@@ -263,6 +412,19 @@
         document.getElementById(btn.dataset.target).classList.add("active");
       });
     });
+
+    function saveChanges() {
+      lastSaved = toggle.checked;
+      isDirty = false;
+      saveBar.classList.add("hidden");
+      // next step: backend call
+    }
+
+    function discardChanges() {
+      toggle.checked = lastSaved;
+      isDirty = false;
+      saveBar.classList.add("hidden");
+    }
   </script>
 
 </body>
